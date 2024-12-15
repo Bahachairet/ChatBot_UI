@@ -1,5 +1,5 @@
 # Use a lightweight Node.js image
-FROM node:16-alpine as build
+FROM node:18-alpine
 
 # Set the working directory
 WORKDIR /app
@@ -10,14 +10,14 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+# Install Angular CLI globally
+RUN npm install -g @angular/cli
+
 # Copy the rest of the application code
 COPY . .
 
-# Build the Angular app
-RUN npm run build --prod
-
-# Use Nginx to serve the built app
-FROM nginx:alpine
-COPY --from=build /app/dist/your-angular-app /usr/share/nginx/html
+# Expose the default Angular development server port
 EXPOSE 4200
-CMD ["nginx", "-g", "daemon off;"]
+
+# Run the Angular development server
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200"]
